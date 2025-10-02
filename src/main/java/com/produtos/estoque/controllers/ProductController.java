@@ -1,23 +1,41 @@
 package com.produtos.estoque.controllers;
 
+import com.produtos.estoque.dto.ProductDTO;
 import com.produtos.estoque.entities.Product;
 import com.produtos.estoque.repositories.ProductRepository;
+import com.produtos.estoque.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping(value = "/products")
 public class ProductController {
 
     @Autowired
-    private ProductRepository productRepository;
+    private ProductService productService;
 
     @GetMapping
-    public Page<Product> getProducts(Pageable pageable) {
-        return productRepository.findAll(pageable);
+    public Page<ProductDTO> findAll(Pageable pageable) {
+        PageRequest pageRequest = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
+        return productService.findAllPaged(pageable);
     }
+
+
+    @GetMapping(value = "/{id}")
+    public ResponseEntity<ProductDTO> findById(UUID id){
+
+        ProductDTO productDTO = productService.findById(id);
+        return ResponseEntity.ok().body(productDTO);
+
+
+    }
+
 }
