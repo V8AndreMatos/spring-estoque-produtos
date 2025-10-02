@@ -2,6 +2,7 @@ package com.produtos.estoque.services;
 
 import com.produtos.estoque.dto.ProductDTO;
 import com.produtos.estoque.entities.Product;
+import com.produtos.estoque.exceptions.ResourceNotFoundException;
 import com.produtos.estoque.repositories.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -23,12 +24,19 @@ public class ProductService {
         return listProduct.map(ProductDTO::new);
     }
 
-
-
     public ProductDTO findById(UUID id){
 
         return productRepository.findById(id).map(x -> new ProductDTO(x.getId(), x.getName(), x.getPrice(), x.getQuantity()))
                 .orElseThrow(() -> new RuntimeException("Id Not Found" + id));
+    }
+
+    public void deleteById(UUID id){
+
+        try {
+            productRepository.deleteById(id);
+        } catch (Exception e) {
+            throw new ResourceNotFoundException("Id " +id+ " Not Found ");
+        }
     }
 
 }
